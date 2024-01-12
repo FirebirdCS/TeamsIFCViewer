@@ -32,6 +32,9 @@ ifcLoader.settings.wasm = {
   path: "https://unpkg.com/web-ifc@0.0.44/"
 }
 
+await ifcLoader.setup()
+
+
 const highlighter = new OBC.FragmentHighlighter(viewer)
 await highlighter.setup()
 
