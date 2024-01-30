@@ -1,6 +1,6 @@
 import * as OBC from "openbim-components"
 import * as THREE from "three"
-import { ExampleTool } from "./bim-components"
+// import { ExampleTool } from "./bim-components"
 
 const viewer = new OBC.Components()
 
@@ -38,9 +38,35 @@ await ifcLoader.setup()
 const highlighter = new OBC.FragmentHighlighter(viewer)
 await highlighter.setup()
 
+
+
 const culler = new OBC.ScreenCuller(viewer)
 await culler.setup()
 cameraComponent.controls.addEventListener("sleep", () => culler.needsUpdate = true)
+
+const dimensions = new OBC.LengthMeasurement(viewer);
+
+const clipper = new OBC.SimpleClipper(viewer);
+
+window.addEventListener('keydown', (event) => {
+  if (event.code === 'KeyD' && (event.ctrlKey || event.metaKey)) {
+    dimensions.create();
+  }
+});
+
+
+viewerContainer.ondblclick = () => {
+  clipper.create();
+};
+
+window.onkeydown = (event) => {
+  if (event.code === 'Delete' || event.code === 'Backspace') {
+    dimensions.delete();
+    clipper.delete();
+  }
+}
+
+
 
 const propertiesProcessor = new OBC.IfcPropertiesProcessor(viewer)
 highlighter.events.select.onClear.add(() => {
@@ -59,17 +85,21 @@ ifcLoader.onIfcLoaded.add(async model => {
   culler.needsUpdate = true
 })
 
-const exampleTool = new ExampleTool(viewer)
-await exampleTool.setup({
-  message: "Hi there from ExampleTool!",
-  requiredSetting: 123
-})
+
+
+// const exampleTool = new ExampleTool(viewer)
+// await exampleTool.setup({
+//   message: "Hi there from ExampleTool!",
+//   requiredSetting: 123
+// })
 
 const mainToolbar = new OBC.Toolbar(viewer)
 mainToolbar.addChild(
   ifcLoader.uiElement.get("main"),
   propertiesProcessor.uiElement.get("main"),
-  exampleTool.uiElement.get("activationBtn")
+  dimensions.uiElement.get("main"),
+  clipper.uiElement.get("main"),
+  // exampleTool.uiElement.get("activationBtn")
 )
 
 viewer.ui.addToolbar(mainToolbar)
